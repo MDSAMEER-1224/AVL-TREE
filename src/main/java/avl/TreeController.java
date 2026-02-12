@@ -126,23 +126,35 @@ public class TreeController implements HttpHandler {
     }
 
     private void serveStatic(HttpExchange exchange, String path) throws IOException {
-        if (path.equals("/") || path.isEmpty()) path = "/index.html";
-        Path file = staticRoot.resolve(path.substring(1)).normalize();
-        if (!file.startsWith(staticRoot) || !Files.isRegularFile(file)) {
-            file = staticRoot.resolve("index.html").normalize();
-        }
-        if (!Files.isRegularFile(file)) {
-            sendJson(exchange, 404, jsonMessage("Not found"));
-            return;
-        }
-        byte[] content = Files.readAllBytes(file);
-        String contentType = contentType(path);
-        exchange.getResponseHeaders().set("Content-Type", contentType);
-        exchange.sendResponseHeaders(200, content.length);
-        try (OutputStream out = exchange.getResponseBody()) {
-            out.write(content);
-        }
+
+    if (path.equals("/") || path.isEmpty()) {
+        path = "/index.html";
     }
+
+    Path file = staticRoot.resolve(path.substring(1)).normalize();
+
+    // Security check
+    if (!file.startsWith(staticRoot)) {
+        sendJson(exchange, 403, jsonMessage("Forbidden"));
+        return;
+    }
+
+    // If file does not exist → return 404
+    if (!Files.exists(file) || !Files.isRegularFile(file)) {
+        sendJson(exchange, 404, jsonMessage("Not found"));
+        return;
+    }
+
+    byte[] content = Files.readAllBytes(file);
+
+    exchange.getResponseHeaders().set("Content-Type", contentType(path));
+    exchange.sendResponseHeaders(200, content.length);
+
+    try (OutputStream out = exchange.getResponseBody()) {
+        out.write(content);
+    }
+}
+
 
     private static String contentType(String path) {
         if (path.endsWith(".html")) return "text/html; charset=UTF-8";
