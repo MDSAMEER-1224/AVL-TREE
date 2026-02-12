@@ -20,6 +20,7 @@ public class Main {
         // Serve files from root directory
         Path staticRoot = Paths.get(".").toAbsolutePath();
 
+
         AVLTree tree = new AVLTree();
         TreeController controller = new TreeController(tree, staticRoot);
 
