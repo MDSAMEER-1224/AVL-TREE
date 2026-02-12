@@ -133,13 +133,6 @@ public class TreeController implements HttpHandler {
 
     Path file = staticRoot.resolve(path.substring(1)).normalize();
 
-    // Security check
-    if (!file.startsWith(staticRoot)) {
-        sendJson(exchange, 403, jsonMessage("Forbidden"));
-        return;
-    }
-
-    // If file does not exist → return 404
     if (!Files.exists(file) || !Files.isRegularFile(file)) {
         sendJson(exchange, 404, jsonMessage("Not found"));
         return;
@@ -154,6 +147,7 @@ public class TreeController implements HttpHandler {
         out.write(content);
     }
 }
+
 
 
     private static String contentType(String path) {
