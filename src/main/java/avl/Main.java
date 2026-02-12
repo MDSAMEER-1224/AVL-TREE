@@ -17,7 +17,9 @@ public class Main {
         // Use Render's dynamic PORT (fallback to 8080 for local testing)
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
 
-        Path staticRoot = Paths.get("static").toAbsolutePath();
+        // Serve files from root directory
+        Path staticRoot = Paths.get(".").toAbsolutePath();
+
         AVLTree tree = new AVLTree();
         TreeController controller = new TreeController(tree, staticRoot);
 
